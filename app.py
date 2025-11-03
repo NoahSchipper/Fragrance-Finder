@@ -21,6 +21,19 @@ import random
 from typing import List, Optional
 from pathlib import Path
 
+def safe_float(val, default=0.0):
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return default
+
+def safe_int(val, default=None):
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Fragrance Selector API",
@@ -178,7 +191,7 @@ async def find_similar_fragrances(request: SimilarRequest):
     for idx in top_indices:
         if idx != perfume_idx:  # Skip the query perfume itself
             frag = FRAGRANCES[idx].copy()
-            frag['similarity_score'] = float(similarities[idx])
+            frag['similarity_score'] = safe_float(similarities[idx])
             results.append(frag)
     
     return {
@@ -222,7 +235,7 @@ async def find_by_notes(request: NoteRequest):
     
     # Sort by match count (most matches first), then by rating
     matches.sort(
-        key=lambda x: (x['match_count'], float(x.get('Rating Value', 0))),
+        key=lambda x: (x['match_count'], safe_float(x.get('Rating Value', 0))),
         reverse=True
     )
     
@@ -263,21 +276,23 @@ async def get_random_fragrance(
     if min_rating > 0:
         filtered = [
             f for f in filtered 
-            if float(f.get('Rating Value', 0)) >= min_rating
+            if safe_float(f.get('Rating Value', 0)) >= min_rating
         ]
     
     # Apply year filters
-    if year_min:
+    if year_min is not None:
         filtered = [
-            f for f in filtered 
-            if f.get('Year') and float(f.get('Year', 0)) >= year_min
+            f for f in filtered
+            if safe_int(f.get('Year')) is not None and safe_int(f.get('Year')) >= year_min
         ]
+
     
-    if year_max:
+    if year_max is not None:
         filtered = [
-            f for f in filtered 
-            if f.get('Year') and float(f.get('Year', 0)) <= year_max
+            f for f in filtered
+            if safe_int(f.get('Year')) is not None and safe_int(f.get('Year')) <= year_max
         ]
+
     
     if not filtered:
         raise HTTPException(
