@@ -26,6 +26,11 @@ import urllib.request
 # ---------------------
 # Utility functions
 # ---------------------
+
+for frag in FRAGRANCES:
+    if 'Year' in frag and frag['Year'] is not None:
+        frag['Year'] = int(frag['Year'])
+
 def safe_float(val, default=0.0):
     """Convert to float and make sure it is JSON serializable"""
     try:
