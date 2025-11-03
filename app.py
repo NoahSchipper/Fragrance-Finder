@@ -42,6 +42,24 @@ def safe_int(val, default=None):
         return int(val)
     except (TypeError, ValueError):
         return default
+    
+def sanitize_json(obj):
+    """Recursively sanitize a dict or list for JSON serialization"""
+    if isinstance(obj, dict):
+        return {k: sanitize_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_json(v) for v in obj]
+    elif isinstance(obj, (float, np.floating)):
+        if np.isnan(obj) or np.isinf(obj):
+            return 0.0
+        # Optional: cap extremely large floats
+        if abs(obj) > 1e308:
+            return 0.0
+        return float(obj)
+    elif isinstance(obj, (int, np.integer)):
+        return int(obj)
+    else:
+        return obj
 
 # ---------------------
 # FastAPI setup
@@ -152,10 +170,10 @@ async def root():
 async def find_similar_fragrances(request: SimilarRequest):
     perfume_name = request.perfume_name.strip()
     limit = min(request.limit, 50)
-
+    
     if not perfume_name:
         raise HTTPException(status_code=400, detail="Perfume name is required")
-
+    
     perfume = None
     perfume_idx = None
     for idx, frag in enumerate(FRAGRANCES):
@@ -171,23 +189,22 @@ async def find_similar_fragrances(request: SimilarRequest):
                 break
     if perfume is None:
         raise HTTPException(status_code=404, detail=f"Perfume '{perfume_name}' not found.")
-
+    
     query_embedding = EMBEDDINGS[perfume_idx].reshape(1, -1)
     similarities = cosine_similarity(query_embedding, EMBEDDINGS)[0]
-
     top_indices = np.argsort(similarities)[-(limit+1):-1][::-1]
+
     results = []
     for idx in top_indices:
         if idx != perfume_idx:
             frag = FRAGRANCES[idx].copy()
             frag['similarity_score'] = safe_float(similarities[idx])
-            frag['Rating Value'] = safe_float(frag.get('Rating Value', 0))
             results.append(frag)
-
-    return {
+    
+    return sanitize_json({
         "query": perfume,
         "results": results[:limit]
-    }
+    })
 
 # ---------------------
 # Find by notes
@@ -196,33 +213,27 @@ async def find_similar_fragrances(request: SimilarRequest):
 async def find_by_notes(request: NoteRequest):
     notes = [note.strip().lower() for note in request.notes if note.strip()]
     limit = min(request.limit, 100)
-
+    
     if not notes:
         raise HTTPException(status_code=400, detail="At least one note is required")
-
+    
     matches = []
     for frag in FRAGRANCES:
-        all_notes = ' '.join([str(frag.get('Top', '')),
-                              str(frag.get('Middle', '')),
-                              str(frag.get('Base', ''))]).lower()
+        all_notes = ' '.join([str(frag.get('Top', '')), str(frag.get('Middle', '')), str(frag.get('Base', ''))]).lower()
         match_count = sum(1 for note in notes if note in all_notes)
         if match_count > 0:
             frag_copy = frag.copy()
             frag_copy['match_count'] = match_count
-            frag_copy['match_percentage'] = safe_float(round((match_count / len(notes)) * 100, 1))
-            frag_copy['Rating Value'] = safe_float(frag.get('Rating Value', 0))
+            frag_copy['match_percentage'] = round((match_count / len(notes)) * 100, 1)
             matches.append(frag_copy)
-
-    matches.sort(
-        key=lambda x: (x['match_count'], x['Rating Value']),
-        reverse=True
-    )
-
-    return {
+    
+    matches.sort(key=lambda x: (x['match_count'], safe_float(x.get('Rating Value', 0))), reverse=True)
+    
+    return sanitize_json({
         "query_notes": notes,
         "total_matches": len(matches),
         "results": matches[:limit]
-    }
+    })
 
 # ---------------------
 # Random fragrance
@@ -235,24 +246,26 @@ async def get_random_fragrance(
     year_max: Optional[int] = None
 ):
     filtered = FRAGRANCES.copy()
-
+    
     if gender:
         gender_lower = gender.lower()
         filtered = [f for f in filtered if gender_lower in str(f.get('Gender', '')).lower()]
+    
     if min_rating > 0:
         filtered = [f for f in filtered if safe_float(f.get('Rating Value', 0)) >= min_rating]
+    
     if year_min is not None:
-        filtered = [f for f in filtered if (y := safe_int(f.get('Year'))) is not None and y >= year_min]
+        filtered = [f for f in filtered if safe_int(f.get('Year')) is not None and safe_int(f.get('Year')) >= year_min]
+    
     if year_max is not None:
-        filtered = [f for f in filtered if (y := safe_int(f.get('Year'))) is not None and y <= year_max]
-
+        filtered = [f for f in filtered if safe_int(f.get('Year')) is not None and safe_int(f.get('Year')) <= year_max]
+    
     if not filtered:
         raise HTTPException(status_code=404, detail="No fragrances match the specified filters")
-
-    result = random.choice(filtered).copy()
-    result['Rating Value'] = safe_float(result.get('Rating Value', 0))
-
-    return {
+    
+    result = random.choice(filtered)
+    
+    return sanitize_json({
         "filters_applied": {
             "gender": gender,
             "min_rating": min_rating,
@@ -260,26 +273,36 @@ async def get_random_fragrance(
         },
         "total_matching": len(filtered),
         "result": result
-    }
+    })
 
 # ---------------------
 # List fragrances
 # ---------------------
 @app.get("/api/fragrances/list")
-async def list_fragrances(limit: int = 100, offset: int = 0, search: Optional[str] = None):
+async def list_fragrances(
+    limit: int = 100,
+    offset: int = 0,
+    search: Optional[str] = None
+):
     fragrances = FRAGRANCES
+    
     if search:
         search_lower = search.lower()
-        fragrances = [f for f in fragrances
-                      if search_lower in f.get('Perfume', '').lower() or
-                         search_lower in f.get('Brand', '').lower()]
+        fragrances = [
+            f for f in fragrances
+            if search_lower in f.get('Perfume', '').lower() or
+               search_lower in f.get('Brand', '').lower()
+        ]
+    
     total = len(fragrances)
-    results = []
-    for f in fragrances[offset:offset+limit]:
-        frag = f.copy()
-        frag['Rating Value'] = safe_float(frag.get('Rating Value', 0))
-        results.append(frag)
-    return {"total": total, "offset": offset, "limit": limit, "results": results}
+    results = fragrances[offset:offset + limit]
+    
+    return sanitize_json({
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "results": results
+    })
 
 # ---------------------
 # List all notes
@@ -287,13 +310,18 @@ async def list_fragrances(limit: int = 100, offset: int = 0, search: Optional[st
 @app.get("/api/notes/list")
 async def list_all_notes():
     notes = set()
+    
     for frag in FRAGRANCES:
         for note_type in ['Top', 'Middle', 'Base']:
             note_text = frag.get(note_type, '')
             if note_text:
                 individual_notes = note_text.replace(',', ' ').split()
                 notes.update([n.strip().lower() for n in individual_notes if n.strip()])
-    return {"total_notes": len(notes), "notes": sorted(list(notes))}
+    
+    return sanitize_json({
+        "total_notes": len(notes),
+        "notes": sorted(list(notes))
+    })
 
 # ---------------------
 # Health check
