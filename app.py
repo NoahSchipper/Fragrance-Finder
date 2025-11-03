@@ -37,11 +37,12 @@ def safe_float(val, default=0.0):
         return default
 
 def safe_int(val, default=None):
-    """Convert to int, return default on error"""
+    """Convert to int safely"""
     try:
-        return int(val)
+        return int(float(val))  # Convert float to int safely
     except (TypeError, ValueError):
         return default
+
     
 def sanitize_json(obj):
     """Recursively sanitize a dict or list for JSON serialization"""
