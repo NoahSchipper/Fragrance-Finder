@@ -97,7 +97,7 @@ async def load_data():
         print("[ERROR] embeddings.npy not found!")
         raise FileNotFoundError("embeddings.npy is required")
     
-    EMBEDDINGS = np.load('embeddings.npy')
+    EMBEDDINGS = np.load('embeddings.npy', allow_pickle=True)
     print(f"[SUCCESS] Loaded embeddings: {EMBEDDINGS.shape}")
     
     # Load fragrances
