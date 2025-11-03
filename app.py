@@ -26,11 +26,6 @@ import urllib.request
 # ---------------------
 # Utility functions
 # ---------------------
-
-for frag in FRAGRANCES:
-    if 'Year' in frag and frag['Year'] is not None:
-        frag['Year'] = int(frag['Year'])
-
 def safe_float(val, default=0.0):
     """Convert to float and make sure it is JSON serializable"""
     try:
@@ -149,6 +144,14 @@ async def load_data():
         raise FileNotFoundError("fragrances.json is required")
     with open('fragrances.json', 'r', encoding='utf-8') as f:
         FRAGRANCES = json.load(f)
+    
+    # Sanitize Year to int
+    for frag in FRAGRANCES:
+        if 'Year' in frag and frag['Year'] is not None:
+            try:
+                frag['Year'] = int(frag['Year'])
+            except (ValueError, TypeError):
+                frag['Year'] = None
     print(f"[SUCCESS] Loaded {len(FRAGRANCES)} fragrances")
     print("[STARTUP] API ready!")
 
