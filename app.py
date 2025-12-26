@@ -140,13 +140,6 @@ async def load_data():
         FRAGRANCES = json.load(f)
     print(f"[SUCCESS] Loaded {len(FRAGRANCES)} fragrances")
     
-    # Debug: Print unique gender values
-    unique_genders = set()
-    for frag in FRAGRANCES:
-        if frag.get("Gender"):
-            unique_genders.add(frag["Gender"])
-    print(f"[DEBUG] Unique gender values in dataset: {unique_genders}")
-    
     print("[STARTUP] API ready!")
 
 @app.get("/")
@@ -280,7 +273,7 @@ async def get_random_fragrance(
     Mode 3: Get a random fragrance with optional filters
     
     Filters:
-    - gender: "men", "women", "unisex"
+    - gender: "male", "female", "unisex"
     - min_rating: minimum rating value (0-5)
     - year_min/year_max: year range
     """
@@ -288,14 +281,13 @@ async def get_random_fragrance(
     # Start with all fragrances
     filtered = FRAGRANCES.copy()
     
-    # Apply gender filter - FIXED: Use exact match instead of substring
+    # Apply gender filter
     if gender:
-        gender_lower = gender.lower().strip()
+        gender_lower = gender.lower()
         filtered = [
             f for f in filtered 
-            if str(f.get('Gender', '')).lower().strip() == gender_lower
+            if str(f.get('Gender', '')).lower().strip() == gender_lower        
         ]
-        print(f"[DEBUG] Gender filter '{gender_lower}' returned {len(filtered)} fragrances")
     
     # Apply rating filter
     if min_rating > 0:
