@@ -220,31 +220,44 @@ async def find_similar_fragrances(request: SimilarRequest):
 # ---------------------
 @app.post("/api/recommend/by-notes")
 async def find_by_notes(request: NoteRequest):
+    """Find fragrances by main accord"""
     notes = [note.strip().lower() for note in request.notes if note.strip()]
     limit = min(request.limit, 100)
     
     if not notes:
         raise HTTPException(status_code=400, detail="At least one note is required")
     
-    matches = []
-    for frag in FRAGRANCES:
-        all_notes = ' '.join([str(frag.get('Top', '')), str(frag.get('Middle', '')), str(frag.get('Base', ''))]).lower()
-        match_count = sum(1 for note in notes if note in all_notes)
-        if match_count > 0:
-            frag_copy = frag.copy()
-            frag_copy['match_count'] = match_count
-            frag_copy['match_percentage'] = round((match_count / len(notes)) * 100, 1)
-            matches.append(frag_copy)
+    search_accord = notes[0]  # Taking first note as the accord to search
     
-    matches.sort(key=lambda x: (x['match_count'], safe_float(x.get('Rating Value', 0))), reverse=True)
+    results = []
+    
+    for fragrance in FRAGRANCES:
+        main_accords = str(fragrance.get("Main Accords", "")).lower()
+        
+        # Split into list and strip whitespace from each accord
+        accords_list = [a.strip() for a in main_accords.split(",")]
+        
+        # Check if search_accord is an exact match in the list
+        if search_accord in accords_list:
+            # Calculate match percentage based on position
+            match_percentage = 60
+            if accords_list and accords_list[0] == search_accord:
+                match_percentage = 100
+            elif len(accords_list) > 1 and accords_list[1] == search_accord:
+                match_percentage = 80
+            
+            frag = fragrance.copy()
+            frag["match_percentage"] = match_percentage
+            results.append(frag)
+    
+    # Sort by match percentage
+    results.sort(key=lambda x: x["match_percentage"], reverse=True)
     
     return sanitize_json({
-        "query_notes": notes,
-        "total_matches": len(matches),
-        "results": matches[:limit]
+        "total_results": len(results),
+        "results": results[:limit]
     })
-
-
+    
 # ---------------------
 # Random fragrance
 # ---------------------
