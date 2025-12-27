@@ -231,18 +231,21 @@ async def find_by_notes(request: NoteRequest):
     
     results = []
     
-    # DEBUG: Print first 5 fragrances' accords
-    for i, frag in enumerate(FRAGRANCES[:5]):
-        print(f"Fragrance {i}: {frag.get('Main Accords', '')}")
+    # Find a fragrance that should have "woody" and print its accords
+    for fragrance in FRAGRANCES[:20]:
+        main_accords_raw = fragrance.get("Main Accords", "")
+        if main_accords_raw and "woody" in str(main_accords_raw).lower():
+            print(f"Found woody fragrance!")
+            print(f"Raw accords: '{main_accords_raw}'")
+            print(f"Raw type: {type(main_accords_raw)}")
+            print(f"Repr: {repr(main_accords_raw)}")
+            accords_list = [a.strip() for a in str(main_accords_raw).lower().split(",")]
+            print(f"Split list: {accords_list}")
+            break
     
     for fragrance in FRAGRANCES:
         main_accords = str(fragrance.get("Main Accords", "")).lower()
         accords_list = [a.strip() for a in main_accords.split(",")]
-        
-        # DEBUG: Print for first match attempt
-        if fragrance == FRAGRANCES[0]:
-            print(f"Search: '{search_accord}'")
-            print(f"Accords list: {accords_list}")
         
         if search_accord in accords_list:
             match_percentage = 60
