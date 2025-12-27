@@ -219,30 +219,57 @@ async def find_similar_fragrances(request: SimilarRequest):
 # Find by notes
 # ---------------------
 @app.post("/api/recommend/by-notes")
-async def find_by_notes(request: NoteRequest):
-    notes = [note.strip().lower() for note in request.notes if note.strip()]
-    limit = min(request.limit, 100)
+async def recommend_by_notes(request: dict):
+    """Find fragrances by main accord"""
+    notes = request.get("notes", [])
+    limit = request.get("limit", 50)
     
-    if not notes:
+    if not notes or len(notes) == 0:
         raise HTTPException(status_code=400, detail="At least one note is required")
     
-    matches = []
-    for frag in FRAGRANCES:
-        all_notes = ' '.join([str(frag.get('Top', '')), str(frag.get('Middle', '')), str(frag.get('Base', ''))]).lower()
-        match_count = sum(1 for note in notes if note in all_notes)
-        if match_count > 0:
-            frag_copy = frag.copy()
-            frag_copy['match_count'] = match_count
-            frag_copy['match_percentage'] = round((match_count / len(notes)) * 100, 1)
-            matches.append(frag_copy)
+    search_accord = notes[0].lower().strip()  # Taking first note as the accord to search
     
-    matches.sort(key=lambda x: (x['match_count'], safe_float(x.get('Rating Value', 0))), reverse=True)
+    results = []
     
-    return sanitize_json({
-        "query_notes": notes,
-        "total_matches": len(matches),
-        "results": matches[:limit]
-    })
+    for idx, row in df.iterrows():
+        main_accords = str(row.get("main_accords", "")).lower()
+        
+        # Check if the search accord is in the main_accords
+        if search_accord in main_accords:
+            accords_list = [a.strip() for a in main_accords.split(",")]
+            
+            # Calculate match percentage based on position
+            match_percentage = 60  # Default for any match
+            
+            # Check if it's the first (primary) accord
+            if accords_list and search_accord in accords_list[0]:
+                match_percentage = 100
+            elif len(accords_list) > 1 and search_accord in accords_list[1]:
+                match_percentage = 80
+            
+            results.append({
+                "match_percentage": match_percentage,
+                "perfume": row.get("perfume", ""),
+                "brand": row.get("brand", ""),
+                "launch_year": row.get("launch_year", ""),
+                "main_accords": row.get("main_accords", ""),
+                "notes": row.get("notes", ""),
+                "top_notes": row.get("top_notes", ""),
+                "middle_notes": row.get("middle_notes", ""),
+                "base_notes": row.get("base_notes", ""),
+                "rating_value": row.get("rating_value", ""),
+                "rating_count": row.get("rating_count", ""),
+                "gender": row.get("gender", ""),
+                "url": row.get("url", "")
+            })
+    
+    # Sort by match percentage (highest first)
+    results.sort(key=lambda x: x["match_percentage"], reverse=True)
+    
+    return {
+        "total_results": len(results),
+        "results": results[:limit]
+    }
 
 # ---------------------
 # Random fragrance
@@ -331,6 +358,25 @@ async def list_all_notes():
         "total_notes": len(notes),
         "notes": sorted(list(notes))
     })
+
+@app.get("/api/accords/list")
+async def list_accords():
+    """Get all unique main accords from the dataset"""
+    all_accords = set()
+    
+    for accords in df["main_accords"].dropna():
+        accord_list = str(accords).split(",")
+        for accord in accord_list:
+            cleaned = accord.strip().lower()
+            if cleaned:
+                all_accords.add(cleaned)
+    
+    sorted_accords = sorted(list(all_accords))
+    
+    return {
+        "total_accords": len(sorted_accords),
+        "accords": sorted_accords
+    }
 
 # ---------------------
 # Health check
