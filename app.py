@@ -227,19 +227,24 @@ async def find_by_notes(request: NoteRequest):
     if not notes:
         raise HTTPException(status_code=400, detail="At least one note is required")
     
-    search_accord = notes[0]  # Taking first note as the accord to search
+    search_accord = notes[0]
     
     results = []
     
+    # DEBUG: Print first 5 fragrances' accords
+    for i, frag in enumerate(FRAGRANCES[:5]):
+        print(f"Fragrance {i}: {frag.get('Main Accords', '')}")
+    
     for fragrance in FRAGRANCES:
         main_accords = str(fragrance.get("Main Accords", "")).lower()
-        
-        # Split into list and strip whitespace from each accord
         accords_list = [a.strip() for a in main_accords.split(",")]
         
-        # Check if search_accord is an exact match in the list
+        # DEBUG: Print for first match attempt
+        if fragrance == FRAGRANCES[0]:
+            print(f"Search: '{search_accord}'")
+            print(f"Accords list: {accords_list}")
+        
         if search_accord in accords_list:
-            # Calculate match percentage based on position
             match_percentage = 60
             if accords_list and accords_list[0] == search_accord:
                 match_percentage = 100
@@ -250,7 +255,6 @@ async def find_by_notes(request: NoteRequest):
             frag["match_percentage"] = match_percentage
             results.append(frag)
     
-    # Sort by match percentage
     results.sort(key=lambda x: x["match_percentage"], reverse=True)
     
     return sanitize_json({
