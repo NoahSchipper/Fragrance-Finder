@@ -231,23 +231,13 @@ async def find_by_notes(request: NoteRequest):
     results = []
     
     for fragrance in FRAGRANCES:
-        main_accords = str(fragrance.get("Main Accords", "")).lower()
+        # Only check mainaccord1 (the primary accord)
+        accord1 = str(fragrance.get("mainaccord1", "")).lower().strip()
         
-        # Try semicolon separator instead of comma
-        accords_list = [a.strip() for a in main_accords.split(";") if a.strip()]
-        
-        if search_accord in accords_list:
-            match_percentage = 60
-            if accords_list and accords_list[0] == search_accord:
-                match_percentage = 100
-            elif len(accords_list) > 1 and accords_list[1] == search_accord:
-                match_percentage = 80
-            
+        if search_accord == accord1:
             frag = fragrance.copy()
-            frag["match_percentage"] = match_percentage
+            frag["match_percentage"] = 100  # Always 100% since it's the main accord
             results.append(frag)
-    
-    results.sort(key=lambda x: x["match_percentage"], reverse=True)
     
     return sanitize_json({
         "total_results": len(results),
@@ -369,17 +359,6 @@ async def list_accords():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "data_loaded": EMBEDDINGS is not None and FRAGRANCES is not None}
-
-@app.get("/api/debug/sample")
-async def get_sample():
-    """Debug endpoint to see the structure"""
-    if FRAGRANCES:
-        # Return first 3 fragrances
-        return {
-            "count": len(FRAGRANCES),
-            "samples": FRAGRANCES[:3]
-        }
-    return {"error": "No fragrances loaded"}
 
 # ---------------------
 # Run app
