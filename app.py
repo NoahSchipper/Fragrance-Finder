@@ -370,6 +370,17 @@ async def list_accords():
 async def health_check():
     return {"status": "healthy", "data_loaded": EMBEDDINGS is not None and FRAGRANCES is not None}
 
+@app.get("/api/debug/sample")
+async def get_sample():
+    """Debug endpoint to see the structure"""
+    if FRAGRANCES:
+        # Return first 3 fragrances
+        return {
+            "count": len(FRAGRANCES),
+            "samples": FRAGRANCES[:3]
+        }
+    return {"error": "No fragrances loaded"}
+
 # ---------------------
 # Run app
 # ---------------------
