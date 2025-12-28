@@ -229,19 +229,24 @@ async def find_by_notes(request: NoteRequest):
     
     search_accord = notes[0]
     
-    results = []
+    # DEBUG: Check all possible key names
+    if FRAGRANCES:
+        print(f"First fragrance ALL data: {FRAGRANCES[0]}")
+        print(f"Keys: {list(FRAGRANCES[0].keys())}")
     
-    # Find a fragrance that should have "woody" and print its accords
-    for fragrance in FRAGRANCES[:20]:
-        main_accords_raw = fragrance.get("Main Accords", "")
-        if main_accords_raw and "woody" in str(main_accords_raw).lower():
-            print(f"Found woody fragrance!")
-            print(f"Raw accords: '{main_accords_raw}'")
-            print(f"Raw type: {type(main_accords_raw)}")
-            print(f"Repr: {repr(main_accords_raw)}")
-            accords_list = [a.strip() for a in str(main_accords_raw).lower().split(",")]
-            print(f"Split list: {accords_list}")
-            break
+    # DEBUG: Count how many have woody in ANY field
+    woody_count = 0
+    for fragrance in FRAGRANCES:
+        for key, value in fragrance.items():
+            if "accord" in key.lower() and "woody" in str(value).lower():
+                woody_count += 1
+                if woody_count == 1:  # Print first match
+                    print(f"Found woody in key '{key}': '{value}'")
+                    print(f"Type: {type(value)}")
+                break
+    print(f"Total fragrances with 'woody' in accord fields: {woody_count}")
+    
+    results = []
     
     for fragrance in FRAGRANCES:
         main_accords = str(fragrance.get("Main Accords", "")).lower()
