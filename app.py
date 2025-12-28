@@ -22,6 +22,7 @@ from typing import List, Optional
 from pathlib import Path
 import os
 import urllib.request
+import random
 
 # ---------------------
 # Utility functions
@@ -238,6 +239,9 @@ async def find_by_notes(request: NoteRequest):
             frag = fragrance.copy()
             frag["match_percentage"] = 100  # Always 100% since it's the main accord
             results.append(frag)
+    
+    # Randomize the results
+    random.shuffle(results)
     
     return sanitize_json({
         "total_results": len(results),
