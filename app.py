@@ -228,29 +228,13 @@ async def find_by_notes(request: NoteRequest):
         raise HTTPException(status_code=400, detail="At least one note is required")
     
     search_accord = notes[0]
-    
-    # DEBUG: Check all possible key names
-    if FRAGRANCES:
-        print(f"First fragrance ALL data: {FRAGRANCES[0]}")
-        print(f"Keys: {list(FRAGRANCES[0].keys())}")
-    
-    # DEBUG: Count how many have woody in ANY field
-    woody_count = 0
-    for fragrance in FRAGRANCES:
-        for key, value in fragrance.items():
-            if "accord" in key.lower() and "woody" in str(value).lower():
-                woody_count += 1
-                if woody_count == 1:  # Print first match
-                    print(f"Found woody in key '{key}': '{value}'")
-                    print(f"Type: {type(value)}")
-                break
-    print(f"Total fragrances with 'woody' in accord fields: {woody_count}")
-    
     results = []
     
     for fragrance in FRAGRANCES:
         main_accords = str(fragrance.get("Main Accords", "")).lower()
-        accords_list = [a.strip() for a in main_accords.split(",")]
+        
+        # Try semicolon separator instead of comma
+        accords_list = [a.strip() for a in main_accords.split(";") if a.strip()]
         
         if search_accord in accords_list:
             match_percentage = 60
