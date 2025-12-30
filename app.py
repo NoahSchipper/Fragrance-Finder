@@ -93,10 +93,12 @@ FRAGRANCES = None
 class SimilarRequest(BaseModel):
     perfume_name: str
     limit: Optional[int] = 10
+    gender: Optional[str] = None
 
 class NoteRequest(BaseModel):
     notes: List[str]
     limit: Optional[int] = 50
+    gender: Optional[str] = None
 
 class RandomRequest(BaseModel):
     gender: Optional[str] = None
@@ -180,6 +182,7 @@ async def root():
 async def find_similar_fragrances(request: SimilarRequest):
     perfume_name = request.perfume_name.strip()
     limit = min(request.limit, 50)
+    gender = request.gender
     
     if not perfume_name:
         raise HTTPException(status_code=400, detail="Perfume name is required")
@@ -208,6 +211,11 @@ async def find_similar_fragrances(request: SimilarRequest):
     for idx in top_indices:
         if idx != perfume_idx:
             frag = FRAGRANCES[idx].copy()
+            if gender:
+                gender_lower = gender.lower().strip()
+                frag_gender = str(frag.get('Gender', '')).lower().strip()
+                if frag_gender != gender_lower:
+                    continue
             frag['similarity_score'] = safe_float(similarities[idx])
             results.append(frag)
     
@@ -224,6 +232,7 @@ async def find_by_notes(request: NoteRequest):
     """Find fragrances by main accord"""
     notes = [note.strip().lower() for note in request.notes if note.strip()]
     limit = min(request.limit, 100)
+    gender = request.gender
     
     if not notes:
         raise HTTPException(status_code=400, detail="At least one note is required")
@@ -232,6 +241,11 @@ async def find_by_notes(request: NoteRequest):
     results = []
     
     for fragrance in FRAGRANCES:
+        if gender:
+            gender_lower = gender.lower().strip()
+            frag_gender = str(fragrance.get('Gender', '')).lower().strip()
+            if frag_gender != gender_lower:
+                continue
         # Only check mainaccord1 (the primary accord)
         accord1 = str(fragrance.get("mainaccord1", "")).lower().strip()
         
