@@ -2,6 +2,10 @@
 
 An AI-powered fragrance recommendation system built with FastAPI. This API provides intelligent fragrance recommendations using cosine similarity on pre-computed embeddings, with support for filtering by notes, accords, gender, ratings, and more.
 
+## Where It's Used
+
+This API powers the fragrance finder at noahschipper.net/fragrance
+
 ## Features
 
 - **Similar Fragrances**: Find fragrances similar to a selected perfume using AI embeddings
