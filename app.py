@@ -5,10 +5,6 @@ This API provides three modes of fragrance recommendation:
 1. Similar fragrances based on a selected fragrance
 2. Fragrances filtered by selected notes
 3. Random fragrance with optional filters
-
-Deploy to Render with embeddings.npy and fragrances.json
-
-Requirements: fastapi, uvicorn, numpy, scikit-learn
 """
 
 from fastapi import FastAPI, HTTPException
@@ -24,9 +20,7 @@ import os
 import urllib.request
 import random
 
-# ---------------------
 # Utility functions
-# ---------------------
 def safe_float(val, default=0.0):
     """Convert to float and make sure it is JSON serializable"""
     try:
@@ -63,9 +57,8 @@ def sanitize_json(obj):
     else:
         return obj
 
-# ---------------------
+
 # FastAPI setup
-# ---------------------
 app = FastAPI(
     title="Fragrance Selector API",
     description="AI-powered fragrance recommendation system",
@@ -81,15 +74,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------
 # Global variables
-# ---------------------
 EMBEDDINGS = None
 FRAGRANCES = None
 
-# ---------------------
 # Request models
-# ---------------------
 class SimilarRequest(BaseModel):
     perfume_name: str
     limit: Optional[int] = 10
@@ -106,9 +95,7 @@ class RandomRequest(BaseModel):
     year_min: Optional[int] = None
     year_max: Optional[int] = None
 
-# ---------------------
 # File download
-# ---------------------
 EMBEDDINGS_URL = os.getenv("EMBEDDINGS_URL", "")
 FRAGRANCES_URL = os.getenv("FRAGRANCES_URL", "")
 
@@ -123,9 +110,7 @@ def download_file(url, filename):
     urllib.request.urlretrieve(url, filename)
     print(f"[SUCCESS] Downloaded {filename}")
 
-# ---------------------
 # Startup event
-# ---------------------
 @app.on_event("startup")
 async def load_data():
     global EMBEDDINGS, FRAGRANCES
@@ -158,9 +143,7 @@ async def load_data():
     print(f"[SUCCESS] Loaded {len(FRAGRANCES)} fragrances")
     print("[STARTUP] API ready!")
 
-# ---------------------
 # Root endpoint
-# ---------------------
 @app.get("/")
 async def root():
     return {
@@ -175,9 +158,7 @@ async def root():
         }
     }
 
-# ---------------------
 # Similar fragrances
-# ---------------------
 @app.post("/api/recommend/similar")
 async def find_similar_fragrances(request: SimilarRequest):
     perfume_name = request.perfume_name.strip()
@@ -223,10 +204,8 @@ async def find_similar_fragrances(request: SimilarRequest):
         "query": perfume,
         "results": results[:limit]
     })
-
-# ---------------------
+    
 # Find by notes
-# ---------------------
 @app.post("/api/recommend/by-notes")
 async def find_by_notes(request: NoteRequest):
     """Find fragrances by main accord"""
@@ -262,9 +241,7 @@ async def find_by_notes(request: NoteRequest):
         "results": results[:limit]
     })
     
-# ---------------------
 # Random fragrance
-# ---------------------
 @app.get("/api/recommend/random")
 async def get_random_fragrance(
     gender: Optional[str] = None,
@@ -302,9 +279,7 @@ async def get_random_fragrance(
         "result": result
     })
 
-# ---------------------
 # List fragrances
-# ---------------------
 @app.get("/api/fragrances/list")
 async def list_fragrances(
     limit: int = 100,
@@ -331,9 +306,7 @@ async def list_fragrances(
         "results": results
     })
 
-# ---------------------
 # List all notes
-# ---------------------
 @app.get("/api/notes/list")
 async def list_all_notes():
     notes = set()
@@ -371,9 +344,7 @@ async def list_accords():
         "accords": sorted_accords
     }
 
-# ---------------------
 # Health check
-# ---------------------
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "data_loaded": EMBEDDINGS is not None and FRAGRANCES is not None}
@@ -383,4 +354,5 @@ async def health_check():
 # ---------------------
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
