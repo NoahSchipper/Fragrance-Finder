@@ -46,7 +46,7 @@ An interactive fragrance discovery application designed to simplify the process 
 
 ## Data Sources
 
-Fragrance data used by this project is derived from publicly available information and reference materials.
+Fragrance data used by this project is derived from publicly available information and reference materials on Kaggle.
 
 All data rights, trademarks, and brand names belong to their respective owners.
 
