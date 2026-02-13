@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="assets/cologne.png">
+    <link rel="stylesheet" href="fragrance.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fragrance Finder</title>
+  </head>
+  <body>
+    <div class="options">
+      <div class="similar" data-mode="similar">
+        <h2>Find Similar Fragrances</h2>
+        <p>Enter a fragrance name to find similar options:</p>
+        <div class="input-row">
+          <select id="genderFilterSim">
+            <option value="">Any Gender</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="unisex">Unisex</option>
+          </select>
+          <input
+            type="text"
+            id="fragranceInput"
+            placeholder="Enter a fragrance"
+            autocomplete="off"
+          />
+        </div>
+        <button onclick="findSimilarFragrances()">Find Fragrances</button>
+      </div>
+      <div class="byNotes" data-mode="notes">
+        <h2>Find Fragrances by Accord</h2>
+        <p>Enter an accord to find fragrances with that scent:</p>
+        <div class="input-row">
+          <select id="genderFilterAcc">
+            <option value="">Any Gender</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="unisex">Unisex</option>
+          </select>
+          <input
+            type="text"
+            id="noteInput"
+            placeholder="Enter a scent"
+            autocomplete="off"
+          />
+        </div>
+        <button onclick="findByNotes()">Find Fragrances</button>
+      </div>
+      <div class="surpriseMe" data-mode="random">
+        <h2>Surprise Me</h2>
+        <p>Get a random fragrance suggestion:</p>
+        <div class="input-row">
+          <select id="genderFilterRan">
+            <option value="">Any Gender</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="unisex">Unisex</option>
+          </select>
+        </div>
+        <button onClick="surpriseMe()">Get a Surprise Fragrance</button>
+      </div>
+    </div>
+    <div class="ResultsContainer">
+      <!-- Mode 1: Similar -->
+      <div class="display-section" id="similarDisplay" style="display: none">
+        <div class="loading-spinner" style="display: none">
+          <p>Finding similar fragrances...</p>
+        </div>
+        <div class="error-message" style="display: none">
+          <p>Oops! Something went wrong. Please try again.</p>
+        </div>
+        <div class="no-results" style="display: none">
+          <p>No fragrances found. Try different search terms!</p>
+        </div>
+        <div class="results-grid">
+          <!-- Results will be displayed here, injected by JS -->
+        </div>
+      </div>
+      <!-- Mode 2: By Notes -->
+      <div class="display-section" id="notesDisplay" style="display: none">
+        <div class="loading-spinner" style="display: none">
+          <p>Finding fragrances by accord...</p>
+        </div>
+        <div class="error-message" style="display: none">
+          <p>Oops! Something went wrong. Please try again.</p>
+        </div>
+        <div class="no-results" style="display: none">
+          <p>No fragrances found. Try different search terms!</p>
+        </div>
+        <div class="results-grid">
+          <!-- Results will be displayed here, injected by JS -->
+        </div>
+      </div>
+      <!-- Mode 3: Surprise Me -->
+      <div class="display-section" id="randomDisplay" style="display: none">
+        <div class="loading-spinner" style="display: none">
+          <p>Finding a random fragrance...</p>
+        </div>
+        <div class="error-message" style="display: none">
+          <p>Oops! Something went wrong. Please try again.</p>
+        </div>
+        <div class="results-grid">
+          <!-- Results will be displayed here, injected by JS -->
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="fragrance.js"></script>
+</html>
