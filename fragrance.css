@@ -1,0 +1,673 @@
+body {
+  font-family: Poppins, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background-color: #02001f;
+  color: white;
+}
+
+::placeholder {
+  color: #030025;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  text-align: center;
+}
+
+input:focus::placeholder {
+  color: transparent;
+}
+
+h2 {
+  text-align: center;
+  color: #ffd700; /* Gold color for headings */
+  margin-bottom: 14px;
+}
+
+.options {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  background: #02001f;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+select {
+  text-align: center;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background-color: #ffd700;
+  color: #030025;
+}
+
+select option {
+  display: flex;
+  color: #030025;
+  font-weight: bold;
+  text-align: left;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.similar {
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+  background: #030025;
+  width: 350px;
+  height: auto;
+  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ffd700;
+  opacity: 1;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out forwards;
+
+}
+
+.similar p {
+  color: #ffd700;
+  align-items: center;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+}
+
+#genderFilterSim {
+  text-align: center;
+  text-align-last: center;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background-color: #ffd700;
+  color: #030025;
+}
+
+.similar input:focus {
+  background-color: #ffd700; /* Keep gold */
+  color: #030025; /* Keep dark text */
+  outline: none; /* Remove blue outline */
+}
+
+.similar button {
+  background-color: #ffd700; /* Gold button */
+  color: #030025; /* Dark text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0;
+}
+
+.similar.dimmed {
+  opacity: 0.4;
+  filter: grayscale(50%);
+}
+
+.byNotes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #030025;
+  width: 350px;
+  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ffd700;
+  opacity: 1;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.byNotes p {
+  color: #ffd700;
+  align-items: center;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+}
+#genderFilterAcc {
+  text-align: center;
+  text-align-last: center;
+}
+
+.byNotes input {
+  text-align: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background-color: #ffd700;
+  color: #030025;
+}
+
+.byNotes button {
+  background-color: #ffd700; /* Gold button */
+  color: #030025; /* Dark text */
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  outline: none;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 0;
+}
+
+.byNotes.dimmed {
+  opacity: 0.4;
+  filter: grayscale(50%);
+}
+
+.surpriseMe {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #030025;
+  width: 350px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 2px solid #ffd700;
+  opacity: 1;
+  transition-duration: 0s;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.surpriseMe p {
+  color: #ffd700;
+  align-items: center;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+}
+
+#genderFilterRan {
+  width: 100%;
+  text-align: center;
+  text-align-last: center;
+}
+.surpriseMe button {
+  background-color: #ffd700; /* Gold button */
+  color: #030025; /* Dark text */
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  outline: none;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 0;
+}
+
+.surpriseMe.dimmed {
+  opacity: 0.4;
+  filter: grayscale(50%);
+}
+
+/* Make all h2 the same height */
+.similar h2,
+.byNotes h2,
+.surpriseMe h2 {
+  text-align: center;
+  color: #ffd700;
+  margin-bottom: 14px;
+  min-height: 32px; /* Fixed height for consistency */
+}
+
+/* Make all description paragraphs the same height */
+.similar p,
+.byNotes p,
+.surpriseMe p {
+  color: #ffd700;
+  font-family: Poppins, sans-serif;
+  font-size: 13.5px;
+  min-height: 40px; /* Fixed height for consistency */
+  text-align: center;
+  align-items: center;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  align-items: center;
+}
+
+/* Gender select dropdowns - consistent width */
+.similar > select,
+.byNotes > select,
+.surpriseMe > select,
+#genderFilterSim,
+#genderFilterAcc,
+#genderFilterRan {
+  text-align: center;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background-color: #ffd700;
+  color: #030025;
+  flex: 1; /* Fixed width for selects */
+}
+
+/* Input fields - take remaining space */
+.similar input,
+.byNotes input {
+  text-align: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background-color: #ffd700;
+  color: #030025;
+  flex: 1; /* Take remaining space */
+  min-width: 0;
+}
+
+#genderFilterSim,
+#genderFilterAcc,
+#genderFilterRan,
+.similar input,
+.byNotes input {
+  box-sizing: border-box;
+  text-align: center;
+  text-align-last: center;
+  height: 35px; /* Force same line height */
+}
+
+.mode-card.active,
+.similar.active,
+.byNotes.active,
+.surpriseMe.active {
+  box-shadow: 0 0 40px #ffd700;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #ffd700;
+}
+
+.loading-spinner::after {
+  content: "";
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 215, 0, 0.3);
+  border-top-color: #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message,
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #ffd700;
+  font-size: 18px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+.result-card {
+  background: #030025;
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.result-card h3 {
+  color: #ffd700;
+  margin-bottom: 8px;
+}
+
+.result-card .brand {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.result-card .rating {
+  color: #ffd700;
+  margin-bottom: 12px;
+}
+
+.result-card .notes {
+  font-size: 13px;
+  color: #ddd;
+  margin-bottom: 12px;
+}
+
+.result-card .accord-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.accord-badge {
+  background: transparent;
+  border: 1px solid #ffd700;
+  color: #ffd700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.result-card a {
+  color: #ffd700;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.result-card a:hover {
+  text-decoration: underline;
+}
+
+/* Center single result for Random mode */
+#randomDisplay .results-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+#randomDisplay .result-card {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Tablet/Small Desktop - Shrink cards to fit horizontally */
+
+@media (max-width: 1280px) {
+  .similar,
+  .byNotes,
+  .surpriseMe {
+    width: 250px; /* Smaller width to fit 3 across */
+    padding: 15px;
+  }
+
+  /* Slightly smaller text */
+  .similar h2,
+  .byNotes h2,
+  .surpriseMe h2 {
+    font-size: 18px;
+  }
+
+  .similar p,
+  .byNotes p,
+  .surpriseMe p {
+    font-size: 12px;
+  }
+
+  ::placeholder {
+  font-size: 12px;
+  }
+  
+}
+
+/* Mobile Styles - Tablets and large phones */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 28px;
+    height: 60px;
+    margin-bottom: 15px;
+  }
+
+  /* Stack mode cards vertically on mobile */
+  .options {
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .similar,
+  .byNotes,
+  .surpriseMe {
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  /* Smaller headings */
+  .similar h2,
+  .byNotes h2,
+  .surpriseMe h2 {
+    font-size: 20px;
+    min-height: auto;
+  }
+
+  /* Smaller paragraph text */
+  .similar p,
+  .byNotes p,
+  .surpriseMe p {
+    font-size: 12px;
+    min-height: auto;
+    margin-bottom: 12px;
+  }
+
+  /* Stack input row on mobile for better usability */
+  .input-row {
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+  }
+
+  /* Full width selects and inputs on mobile */
+  #genderFilterSim,
+  #genderFilterAcc,
+  #genderFilterRan {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .similar input,
+  .byNotes input {
+     width: 100%;
+    flex: none; /* Remove flex to use explicit width */
+    padding: 10px 20px; /* Changed from 12px to match selects */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+
+  /* Buttons */
+  .similar button,
+  .byNotes button,
+  .surpriseMe button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Results grid - single column on mobile */
+  .results-grid,
+  #similarDisplay .results-grid,
+  #notesDisplay .results-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  /* Random mode result card */
+  #randomDisplay .results-grid {
+    padding: 10px;
+  }
+
+  #randomDisplay .result-card {
+    max-width: 100%;
+  }
+
+  /* Result cards */
+  .result-card {
+    padding: 15px;
+  }
+
+  .result-card h3 {
+    font-size: 18px;
+  }
+
+  .result-card .notes {
+    font-size: 12px;
+  }
+
+  /* Accord badges - smaller on mobile */
+  .accord-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+
+  /* Loading/error messages */
+  .loading-spinner,
+  .error-message,
+  .no-results {
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .loading-spinner::after {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Small Mobile Styles - Phones */
+@media (max-width: 640px) {
+  body {
+    padding: 5px;
+  }
+
+  h1 {
+    font-size: 24px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+
+  /* Tighter spacing on mode cards */
+  .options {
+    gap: 10px;
+    padding: 5px;
+  }
+
+  .similar,
+  .byNotes,
+  .surpriseMe {
+    padding: 12px;
+  }
+
+  /* Even smaller text */
+  .similar h2,
+  .byNotes h2,
+  .surpriseMe h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .similar p,
+  .byNotes p,
+  .surpriseMe p {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  /* Tighter input spacing */
+  .input-row {
+    gap: 6px;
+    margin: 6px 0;
+  }
+
+  #genderFilterSim,
+  #genderFilterAcc,
+  #genderFilterRan,
+  .similar input,
+  .byNotes input {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  /* Smaller buttons */
+  .similar button,
+  .byNotes button,
+  .surpriseMe button {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* Results */
+  .results-grid,
+  #similarDisplay .results-grid,
+  #notesDisplay .results-grid,
+  #randomDisplay .results-grid {
+    gap: 10px;
+    padding: 5px;
+  }
+
+  .result-card {
+    padding: 12px;
+  }
+
+  .result-card h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .result-card .brand-name {
+    font-size: 12px;
+  }
+
+  .result-card .notes {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .accord-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  /* Compact messages */
+  .loading-spinner,
+  .error-message,
+  .no-results {
+    padding: 15px;
+    font-size: 14px;
+  }
+
+  .loading-spinner::after {
+    width: 25px;
+    height: 25px;
+  }
+}
